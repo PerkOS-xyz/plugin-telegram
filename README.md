@@ -34,7 +34,7 @@ This indicates a fundamental architectural limitation with the Telegram Bot API.
 
 In ElizaOS multi-agent environments, this error commonly occurs when:
 
-1. **Multiple Agents Using Same Token**: Two or more agents (such as "Eliza" and another character) each have the `@elizaos/plugin-telegram` plugin enabled in their configuration
+1. **Multiple Agents Using Same Token**: Two or more agents (such as "Eliza" and another character) each have the `@perkos/plugin-telegram` plugin enabled in their configuration
 2. **Simultaneous Initialization**: Each agent independently attempts to initialize its own Telegram service during startup
 3. **Token Collision**: All agents use the same `TELEGRAM_BOT_TOKEN` from your environment configuration
 4. **Connection Rejection**: When a second agent tries to establish a connection while another is already active, Telegram rejects it with a 409 error
