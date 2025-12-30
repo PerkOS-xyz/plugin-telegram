@@ -73,13 +73,17 @@ export class TelegramTestSuite implements TestSuite {
    * @throws {Error} If TELEGRAM_TEST_CHAT_ID is not set in the runtime settings or environment variables.
    * @returns {string} The validated chat ID.
    */
-  validateChatId(runtime: IAgentRuntime) {
+  validateChatId(runtime: IAgentRuntime): string | number {
     const testChatId =
       runtime.getSetting('TELEGRAM_TEST_CHAT_ID') || process.env.TELEGRAM_TEST_CHAT_ID;
     if (!testChatId) {
       throw new Error(
         'TELEGRAM_TEST_CHAT_ID is not set. Please provide a valid chat ID in the environment variables.'
       );
+    }
+    // Convert to string or number, excluding boolean
+    if (typeof testChatId === 'boolean') {
+      throw new Error('TELEGRAM_TEST_CHAT_ID cannot be a boolean value.');
     }
     return testChatId;
   }
@@ -228,7 +232,7 @@ export class TelegramTestSuite implements TestSuite {
     }
   }
 
-  async getFileId(chatId: string, imageUrl: string) {
+  async getFileId(chatId: string | number, imageUrl: string) {
     try {
       if (!this.bot) {
         throw new Error('Bot is not initialized.');

@@ -168,10 +168,11 @@ export class TelegramService extends Service {
    */
   private async initializeBot(): Promise<void> {
     this.bot?.start((ctx) => {
-      this.runtime.emitEvent([TelegramEventTypes.SLASH_START], {
-        // we don't need this
+      this.runtime.emitEvent(TelegramEventTypes.SLASH_START as string, {
+        runtime: this.runtime,
+        source: 'telegram',
         ctx,
-      });
+      } as any);
     });
     this.bot?.launch({
       dropPendingUpdates: true,
@@ -395,7 +396,7 @@ export class TelegramService extends Service {
         name: ctx.from.first_name || ctx.from.username || 'Unknown User',
         source: 'telegram',
         channelId: chatId,
-        serverId: chatId,
+        messageServerId: createUniqueUuid(this.runtime, chatId),
         type: ChannelType.GROUP,
         worldId: worldId,
       });
@@ -435,24 +436,25 @@ export class TelegramService extends Service {
         entityId,
         roomId: roomId,
         userName: newMember.username,
-        userId: telegramId,
+        userId: telegramId as UUID,
         name: newMember.first_name || newMember.username || 'Unknown User',
         source: 'telegram',
         channelId: chatId,
-        serverId: chatId,
+        messageServerId: createUniqueUuid(this.runtime, chatId),
         type: ChannelType.GROUP,
         worldId: worldId,
       });
 
       this.syncedEntityIds.add(entityId);
 
-      this.runtime.emitEvent([TelegramEventTypes.ENTITY_JOINED], {
+      this.runtime.emitEvent(TelegramEventTypes.ENTITY_JOINED as string, {
         runtime: this.runtime,
+        source: 'telegram',
         entityId,
         worldId,
         newMember,
         ctx,
-      });
+      } as any);
     }
   }
 
@@ -587,7 +589,7 @@ export class TelegramService extends Service {
       id: worldId,
       name: chatTitle,
       agentId: this.runtime.agentId,
-      serverId: chatId,
+      messageServerId: createUniqueUuid(this.runtime, chatId),
       metadata: {
         source: 'telegram',
         ...(ownerId && { ownership: { ownerId } }),
@@ -611,7 +613,7 @@ export class TelegramService extends Service {
       source: 'telegram',
       type: channelType,
       channelId: chatId,
-      serverId: chatId,
+      messageServerId: createUniqueUuid(this.runtime, chatId),
       worldId,
     };
 
@@ -647,7 +649,7 @@ export class TelegramService extends Service {
       entities,
       generalRoom.id!,
       generalRoom.channelId!,
-      generalRoom.serverId!,
+      chatId,
       generalRoom.type,
       worldId
     );
@@ -724,7 +726,7 @@ export class TelegramService extends Service {
                 userId: telegramMetadata?.id as UUID,
                 source: 'telegram',
                 channelId: channelId,
-                serverId: serverId,
+                messageServerId: createUniqueUuid(this.runtime, serverId),
                 type: roomType,
                 worldId: worldId,
               });
@@ -919,7 +921,7 @@ export class TelegramService extends Service {
         source: 'telegram',
         type: ChannelType.GROUP,
         channelId: `${chatId}-${threadId}`,
-        serverId: chatId,
+        messageServerId: createUniqueUuid(this.runtime, chatId),
         worldId,
         metadata: {
           threadId: threadId,
